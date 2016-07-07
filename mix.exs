@@ -42,6 +42,7 @@ defmodule Phoenix.Mixfile do
     [{:cowboy, "~> 1.0", optional: true},
      {:plug, "~> 1.1"},
      {:phoenix_pubsub, "~> 1.0"},
+     {:phoenix_pubsub_redis, "~> 2.1"},
      {:poison, "~> 1.5 or ~> 2.0"},
      {:gettext, "~> 0.8", only: :test},
 

@@ -1,7 +1,8 @@
 defmodule Phoenix.Test.ChannelTest do
   use ExUnit.Case, async: true
 
-  config = [pubsub: [adapter: Phoenix.PubSub.PG2,
+  config = [pubsub: [adapter: Phoenix.PubSub.Redis,
+                     url: "redis://redis@localhost:6379",
                      name: Phoenix.Test.ChannelTest.PubSub], server: false]
   Application.put_env(:phoenix, __MODULE__.Endpoint, config)
 
@@ -12,6 +13,14 @@ defmodule Phoenix.Test.ChannelTest do
 
   defmodule Endpoint do
     use Phoenix.Endpoint, otp_app: :phoenix
+  end
+
+  defmodule MinimalChannel do
+    use Phoenix.Channel
+
+    def join("foo:ok", _, socket) do
+      {:ok, socket}
+    end
   end
 
   defmodule Channel do
@@ -299,6 +308,12 @@ defmodule Phoenix.Test.ChannelTest do
   end
 
   ## handle_out
+
+  test "handle_out is optional" do
+    socket = subscribe_and_join!(socket(), MinimalChannel, "foo:ok")
+    broadcast_from! socket, "default", %{"foo" => "bar"}
+    assert_push "default", %{"foo" => "bar"}
+  end
 
   test "push broadcasts by default" do
     socket = subscribe_and_join!(socket(), Channel, "foo:ok")
